@@ -24,7 +24,7 @@ Pense nelas como **receitas técnicas** que ensinam seu agente de IA a trabalhar
 | # | Skill | Descrição | Status |
 |---|-------|-----------|--------|
 | 01 | [`orcamento-obra`](./skills/orcamento-obra/SKILL.md) | Orçamento analítico com SINAPI, TCPO, composição própria ou BIM/ABNT | ✅ v1.0 |
-| 02 | `cronograma-obra` | Cronograma físico-financeiro, curva S e histograma de MO | 🔜 Em breve |
+| 02 | [`cronograma-obra`](./skills/cronograma-obra/SKILL.md) | Cronograma físico-financeiro, CPM/PERT, Curva S, EVM/GVA, histograma de MO | ✅ v1.0 |
 | 03 | [`memorial-descritivo-obra`](./skills/memorial-descritivo-obra/SKILL.md) | Memorial descritivo técnico completo — obras, arquitetura e instalações | ✅ v1.0 |
 
 ---
@@ -276,4 +276,52 @@ DEFINIDO / PARCIALMENTE DEFINIDO / PENDENTE / CONFLITANTE."
 # Relatório de pendências para cliente:
 "Gere relatório de pendências por disciplina para envio ao cliente/arquiteto,
 destacando o impacto de cada omissão no orçamento e execução."
+```
+
+---
+
+### Fluxo típico de uso (skill `cronograma-obra`)
+
+A skill atua como especialista PMI — estrutura do zero ou aprimora cronogramas existentes, do físico ao controle financeiro.
+
+```
+1. Agente pergunta: o que precisa? (Gantt / Físico-Financeiro / CPM / EVM / Plano Completo)
+2. Agente coleta: obra, prazo, orçamento, atividades, restrições
+3. Agente monta: EAP hierárquica (WBS) como base do cronograma
+4. Agente calcula: caminho crítico (CPM/PERT) com folgas e atividades críticas
+5. Agente distribui: custos por período → tabela de desembolso mensal
+6. Agente gera: Curva S (físico e financeiro acumulado)
+7. Agente dimensiona: histograma de MO e equipamentos + nivelamento
+8. Agente monitora: EVM com VP, VA, CR, IDC, IDP, EAC e diagnóstico
+9. Agente entrega: relatório completo com marcos, riscos e suprimentos
+```
+
+**Prompts prontos para usar com a skill `cronograma-obra`:**
+
+```
+# Cronograma físico-financeiro completo:
+"Atue como especialista em planejamento de obras. Elabore cronograma físico-financeiro
+completo para [obra], prazo [X meses], orçamento R$ [valor]. Inclua EAP, Gantt com
+caminho crítico, desembolso mensal, Curva S e histograma de MO. Metodologia PMI/PMBOK."
+
+# Caminho crítico (CPM):
+"Calcule o caminho crítico para as seguintes atividades: [lista com duração e
+predecessoras]. Apresente passagem direta/inversa, folgas e duração mínima da obra."
+
+# EVM — controle de obra em andamento:
+"Calcule os indicadores EVM: OAC=R$[valor], % planejado=[X]%, % realizado=[Y]%,
+custo real=R$[valor]. Calcule VP, VA, CR, IDC, IDP, EAC, VAC e IDCN. Diagnóstico
+e recomendações."
+
+# Histograma de mão de obra:
+"Dimensione o histograma de MO para [obra]. Calcule equipe por atividade,
+consolide por período, apresente o histograma e calcule o índice de irregularidade."
+
+# Plano de recuperação de atraso:
+"A obra está [X dias] atrasada. Caminho crítico: [atividades]. Analise causas,
+impacto e proponha plano de recuperação com aceleração das atividades críticas."
+
+# Cronograma de suprimentos:
+"Com base no cronograma físico, elabore o cronograma de compras e contratações
+considerando lead times. Identifique itens críticos e datas limite de compra."
 ```
