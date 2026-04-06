@@ -9,7 +9,10 @@ description: >
   Gantt", "histograma de mão de obra", "histograma de equipamentos", "EAP da obra",
   "linha de base do projeto", "EVM", "valor agregado", "IDP", "IDC", "controle de
   obra", "avanço físico", "avanço financeiro", "cronograma de suprimentos",
-  "cronograma de contratações" ou qualquer variação dessas expressões em português.
+  "cronograma de contratações", "analisar cronograma MS Project", "simular atraso
+  na obra", "e se atrasar", "impacto no prazo", "relatório de obra", "relatório de
+  acompanhamento", "relatório para cliente", "relatório para diretoria", "dashboard
+  de obra" ou qualquer variação dessas expressões em português.
   Não usar para orçamentos (use orcamento-obra) nem para memoriais (use memorial-descritivo-obra).
 license: MIT
 compatibility:
@@ -815,6 +818,286 @@ necessidade, lead time e data limite de compra.
 
 ---
 
+## Etapa 14 — Leitura e Análise de Cronograma Existente (XLS/CSV do MS Project)
+
+Esta etapa habilita a skill a **receber um cronograma já existente** exportado do
+MS Project, Primavera P6, GanttProject ou qualquer planilha estruturada — e realizar
+análise, simulação de cenários e geração de relatórios a partir dele.
+
+> **Princípio:** O GP continua usando a ferramenta que já usa.
+> A IA entra como camada de interpretação e simulação sobre os dados existentes.
+
+### Como exportar do MS Project para a IA:
+
+```
+MS Project:
+  Arquivo → Exportar → Excel (.xlsx) ou CSV
+  Incluir campos: ID, Nome da tarefa, Duração, Início, Término,
+                  Predecessoras, % Concluído, Custo, Recurso
+
+Primavera P6:
+  File → Export → Spreadsheet (XLS) → Activity Export
+
+GanttProject:
+  File → Export → CSV com colunas de tarefa e dependências
+```
+
+### O que a skill extrai automaticamente do arquivo:
+
+```
+✅ Lista completa de atividades com durações e datas
+✅ Estrutura de predecessoras (lógica da rede)
+✅ Caminho crítico (atividades com folga = 0)
+✅ % de avanço físico por atividade
+✅ Alocação de recursos por período
+✅ Custo planejado por atividade
+✅ Desvios entre planejado e realizado (se % concluído preenchido)
+```
+
+### Prompt de leitura — como enviar ao agente:
+
+```
+"Analise o cronograma em anexo (XLS exportado do MS Project).
+Identifique: total de atividades, prazo total, data de entrega,
+caminho crítico, atividades com maior folga e atividades com
+% de avanço abaixo do esperado para a data de hoje [data]."
+```
+
+---
+
+### Simulação de Cenários — Como Funciona
+
+Após carregar o arquivo, o usuário descreve o cenário em linguagem natural.
+A skill calcula o impacto **sem precisar de novo arquivo**.
+
+**Cenários suportados:**
+
+```
+TIPO 1 — Atraso em atividade específica
+  Exemplo: "E se a concretagem do 3º pavimento atrasar 2 semanas?"
+  Skill calcula:
+    → Nova data de entrega da obra
+    → Quais atividades no caminho crítico são afetadas
+    → Folgas consumidas nas atividades subsequentes
+    → Alternativas de recuperação (paralelizar, reforçar equipe)
+
+TIPO 2 — Inclusão de nova frente de obra
+  Exemplo: "E se incluirmos uma frente de instalações elétricas paralela?"
+  Skill calcula:
+    → Conflito de predecessoras com atividades existentes
+    → Redistribuição de recursos necessária
+    → Impacto no prazo global
+    → Custo incremental estimado
+
+TIPO 3 — Antecipação de prazo contratual
+  Exemplo: "Preciso antecipar a entrega em 4 semanas. É viável?"
+  Skill calcula:
+    → Atividades que precisam ser paralelizadas
+    → Recursos adicionais necessários
+    → Custo incremental (fast-track)
+    → Viabilidade técnica e riscos
+
+TIPO 4 — Impacto de chuvas ou paralisação
+  Exemplo: "Período chuvoso deve paralisar a obra por 3 semanas em março."
+  Skill calcula:
+    → Nova data de entrega
+    → Atividades impactadas por tipo (externas vs internas)
+    → Estratégia de remanejamento para atividades internas
+    → Cláusula de force majeure (se obra pública)
+
+TIPO 5 — Redução de equipe
+  Exemplo: "O empreiteiro de estrutura reduziu a equipe em 30%."
+  Skill calcula:
+    → Impacto na duração das atividades afetadas
+    → Propagação no caminho crítico
+    → Necessidade de contratação emergencial
+```
+
+### Formato de resposta para simulação de cenário:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ANÁLISE DE CENÁRIO — [Nome do cenário]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Causa:             [Descrição do evento simulado]
+ Atividade afetada: [Nome + ID]
+ Atraso na atividade: [X semanas/dias]
+
+ IMPACTO NO CRONOGRAMA:
+   Data de entrega atual (baseline): [data]
+   Nova data de entrega projetada:   [data]
+   Impacto total no prazo:           +[X] dias corridos
+
+ ATIVIDADES AFETADAS NO CAMINHO CRÍTICO:
+   → [Atividade A] — folga consumida: [X dias]
+   → [Atividade B] — nova predecessora crítica
+   → [Atividade C] — inicio postergado para [data]
+
+ ATIVIDADES COM FOLGA SUFICIENTE (não impactadas):
+   → [Atividade D] — folga disponível: [X dias] ✅
+   → [Atividade E] — folga disponível: [X dias] ✅
+
+ ALTERNATIVAS DE RECUPERAÇÃO:
+   Opção 1: Paralizar [Atividade X] com [Atividade Y]
+            Redução de prazo: [X dias] | Custo adicional: R$[valor]
+   Opção 2: Reforço de equipe em [Atividade Z]
+            Redução de prazo: [X dias] | Custo adicional: R$[valor]
+   Opção 3: Aceitar o atraso e comunicar contratante
+            Impacto contratual: [multa estimada se aplicável]
+
+ RECOMENDAÇÃO:
+   [Análise técnica objetiva com a melhor opção e justificativa]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
+## Etapa 15 — Geração de Relatório por Público-Alvo
+
+A partir do cronograma (novo ou existente), a skill gera relatórios formatados
+para **públicos diferentes** com linguagem e profundidade adequadas a cada um.
+
+> **Antes:** exportar → formatar no Excel → gerar gráficos → diagramar no Word ou PPT → 4 a 6 horas
+> **Agora:** carregar XLS + prompt → relatório pronto no formato escolhido → 15 minutos
+
+### Público 1 — CLIENTE / CONTRATANTE → Word (.docx)
+
+**Objetivo:** relatório narrativo profissional, linguagem acessível, foco em prazo e entregas.
+
+**Conteúdo:**
+```
+Capa com dados da obra e data de referência
+1. Resumo executivo (status geral em 1 parágrafo)
+2. Indicadores principais (% físico, % financeiro, data prevista de entrega)
+3. Avanço por macroetapa (tabela com previsto × realizado)
+4. Gantt simplificado (macroetapas — sem detalhe técnico)
+5. Pendências e decisões necessárias pelo cliente
+6. Próximas entregas no período (30 dias)
+7. Observações e alertas
+```
+
+**Prompt:**
+```
+"Com base no cronograma anexado, gere um relatório de acompanhamento em formato
+Word para envio ao cliente. Linguagem clara e não técnica. Inclua: resumo executivo,
+% de avanço físico e financeiro, tabela previsto x realizado por macroetapa, gantt
+simplificado, pendências do cliente e próximas entregas em 30 dias. Data de
+referência: [data]."
+```
+
+---
+
+### Público 2 — DIRETORIA / STAKEHOLDERS → PowerPoint (.pptx)
+
+**Objetivo:** deck executivo visual, decisões estratégicas, máximo 10 slides.
+
+**Estrutura de slides:**
+```
+Slide 1 — Capa (obra, período, responsável)
+Slide 2 — Dashboard de KPIs (IDP, IDC, % físico, % financeiro, data entrega)
+Slide 3 — Gantt executivo (macroetapas, caminho crítico em vermelho)
+Slide 4 — Curva S (previsto × realizado — gráfico de linha)
+Slide 5 — Histograma de MO (previsto × realizado — barras)
+Slide 6 — Alertas e riscos críticos (máximo 3 itens)
+Slide 7 — Decisões necessárias (o que a diretoria precisa aprovar)
+Slide 8 — Próximos marcos (30/60/90 dias)
+```
+
+**Prompt:**
+```
+"Com base no cronograma anexado, gere um deck PowerPoint executivo para apresentação
+à diretoria. Máximo 8 slides. Inclua: dashboard de KPIs, Gantt executivo com caminho
+crítico destacado, Curva S previsto x realizado, alertas críticos e decisões necessárias.
+Visual limpo e profissional. Data de referência: [data]."
+```
+
+---
+
+### Público 3 — TIME DE CAMPO / EQUIPE TÉCNICA → Dashboard HTML
+
+**Objetivo:** página interativa, filtros por frente de trabalho, status visual por atividade.
+
+**Funcionalidades do dashboard:**
+```
+✅ Filtro por frente de obra (estrutura / instalações / acabamentos)
+✅ Status por atividade: No prazo / Atrasada / Crítica / Concluída
+✅ Caminho crítico destacado em vermelho
+✅ Atividades da semana corrente em destaque
+✅ % de avanço visual (barra de progresso por atividade)
+✅ Alertas de atividades que iniciam nos próximos 7 dias
+✅ Responsável e equipe por atividade
+✅ Acesso via navegador — sem necessidade de MS Project
+```
+
+**Prompt:**
+```
+"Com base no cronograma anexado, gere um dashboard HTML interativo para o time de
+campo. Inclua: lista de atividades com status visual (no prazo / atrasada / crítica /
+concluída), filtro por frente de trabalho, caminho crítico destacado, atividades da
+semana atual em destaque e alertas para atividades que iniciam em 7 dias.
+Data de referência: [data]."
+```
+
+---
+
+### Distribuição simultânea para múltiplos públicos
+
+A skill pode gerar os três formatos a partir do mesmo arquivo, em sequência:
+
+```
+"Com base no cronograma em anexo, gere:
+1. Relatório Word para o cliente — foco em prazo e entregas, linguagem acessível
+2. Deck PPT para diretoria — KPIs, Gantt executivo, alertas estratégicos
+3. Dashboard HTML para o time de campo — status por atividade, filtros por frente
+Data de referência: [data]. Obra: [nome]."
+```
+
+---
+
+## Etapa 13 — Prompts para o Usuário (atualizado — inclui Etapas 14 e 15)
+
+### Prompts originais (1 a 7) — mantidos integralmente acima
+
+---
+
+### Prompt 8 — Leitura de Cronograma Existente
+
+```
+Analise o cronograma em anexo (XLS exportado do MS Project / CSV / planilha).
+Identifique: total de atividades, prazo total, data de entrega prevista, caminho
+crítico (atividades com folga zero), atividades com maior folga disponível e
+atividades com % de avanço abaixo do esperado para hoje [data].
+Apresente um diagnóstico objetivo do status atual da obra.
+```
+
+---
+
+### Prompt 9 — Simulação de Cenário de Atraso
+
+```
+Com base no cronograma anexado, simule o seguinte cenário:
+[descrever: ex. "atraso de 3 semanas na concretagem do 3º pavimento"].
+Calcule: nova data de entrega, atividades impactadas no caminho crítico,
+folgas consumidas e 3 alternativas de recuperação com custo incremental estimado.
+```
+
+---
+
+### Prompt 10 — Geração de Relatório Multi-Público
+
+```
+Com base no cronograma anexado, gere três versões de relatório:
+1. Word para o cliente — resumo executivo, % avanço, previsto x realizado,
+   pendências e próximas entregas em 30 dias. Linguagem acessível.
+2. PPT para diretoria — dashboard KPIs, Gantt executivo, Curva S,
+   alertas críticos e decisões necessárias. Máximo 8 slides.
+3. Dashboard HTML para o time de campo — status por atividade,
+   filtros por frente, caminho crítico em vermelho, alertas 7 dias.
+Data de referência: [data]. Obra: [nome da obra].
+```
+
+---
+
 ## Referências Técnicas e Normativas
 
 | Referência | Aplicação |
@@ -835,4 +1118,7 @@ necessidade, lead time e data limite de compra.
 - Desenvolvida por **Pr. Hélio Paiva Jr.** — Engenheiro Civil, Especialista em Planejamento
 - Metodologia baseada em PMI/PMBOK, CPM/PERT, EVM e Mattos (2010)
 - Integra com `orcamento-obra` (custos) e `memorial-descritivo-obra` (especificações)
-- Versão 1.0 — Abril/2026
+- Versão 1.1 — Abril/2026
+- v1.1: Etapa 14 (Simulação de Cenários + leitura de XLS/CSV existente) e Etapa 15
+  (Relatórios automatizados por público: cliente/Word, diretoria/PPT, campo/HTML)
+  inspiradas na metodologia BravoCP publicada no LinkedIn

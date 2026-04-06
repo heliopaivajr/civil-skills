@@ -325,3 +325,36 @@ impacto e proponha plano de recuperação com aceleração das atividades críti
 "Com base no cronograma físico, elabore o cronograma de compras e contratações
 considerando lead times. Identifique itens críticos e datas limite de compra."
 ```
+
+---
+
+### Novidades v1.1 — skill `cronograma-obra`
+
+**Etapa 14 — Simulação de Cenários (XLS/CSV existente)**
+Carregue o XLS exportado do MS Project e simule qualquer hipótese em linguagem natural:
+
+```
+# Ler e diagnosticar cronograma existente:
+"Analise o cronograma em anexo (XLS do MS Project). Identifique caminho crítico,
+atividades com folga, % de avanço abaixo do esperado para hoje [data] e diagnóstico
+do status atual."
+
+# Simular atraso e calcular impacto:
+"Com base no cronograma anexado, simule: atraso de 3 semanas na concretagem do
+3º pavimento. Calcule nova data de entrega, atividades impactadas no caminho crítico
+e 3 alternativas de recuperação com custo incremental."
+```
+
+**Etapa 15 — Relatórios Automatizados por Público**
+Do mesmo arquivo, três formatos simultâneos em minutos:
+
+```
+# Três relatórios a partir de um único XLS:
+"Com base no cronograma anexado, gere:
+1. Word para o cliente — resumo executivo, % avanço, previsto x realizado,
+   pendências e próximas entregas. Linguagem acessível.
+2. PPT para diretoria — KPIs, Gantt executivo, Curva S, alertas, decisões.
+3. Dashboard HTML para o time de campo — status por atividade, filtros por
+   frente, caminho crítico destacado, alertas 7 dias.
+Data de referência: [data]."
+```
