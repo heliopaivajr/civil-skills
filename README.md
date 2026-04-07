@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Skills: 1](https://img.shields.io/badge/Skills-1-blue.svg)](#skills-disponíveis)
-[![Versão](https://img.shields.io/badge/Versão-v0.1.0-green.svg)](#changelog)
+[![Versão](https://img.shields.io/badge/Versão-v0.1.1-green.svg)](#changelog)
 [![Compatível com](https://img.shields.io/badge/Compatível%20com-Claude%20%7C%20OpenClaw%20%7C%20Cursor%20%7C%20Copilot-blueviolet.svg)](#compatibilidade)
 
 ---
