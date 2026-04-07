@@ -24,7 +24,7 @@ Pense nelas como **receitas técnicas** que ensinam seu agente de IA a trabalhar
 | # | Skill | Descrição | Status |
 |---|-------|-----------|--------|
 | 01 | [`orcamento-obra`](./skills/orcamento-obra/SKILL.md) | Orçamento analítico com SINAPI, TCPO, composição própria ou BIM/ABNT | ✅ v1.0 |
-| 02 | [`cronograma-obra`](./skills/cronograma-obra/SKILL.md) | Cronograma físico-financeiro, CPM/PERT, Curva S, EVM/GVA, histograma de MO | ✅ v1.0 |
+| 02 | [`cronograma-obra`](./skills/cronograma-obra/SKILL.md) | Cronograma físico-financeiro, CPM/PERT, Curva S, EVM/GVA, histograma de MO | ✅ v1.1 |
 | 03 | [`memorial-descritivo-obra`](./skills/memorial-descritivo-obra/SKILL.md) | Memorial descritivo técnico completo — obras, arquitetura e instalações | ✅ v1.0 |
 
 ---
